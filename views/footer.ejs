@@ -1,0 +1,167 @@
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+    var socket = io();
+    const userRoom = document.getElementById('myroomid').value
+    socket.emit('joinRoom',userRoom)
+    
+
+const btn = document.getElementById('btn');
+const el = document.querySelectorAll('span');
+let presentUserToChatWith =""
+
+for(let i=0;i<el.length;i++){
+  el[i].addEventListener('click',func)
+}
+
+ function func(e){
+  
+   const chatWith = e.srcElement.id;
+   document.getElementById('allMsg').innerHTML=""
+   //console.log(e)
+   const selecth4= document.getElementById('chatWith');
+   const userToChatWith=document.getElementById(((chatWith.split("-"))[0])+"-uid")
+   .innerText.slice(0,-11);
+
+   presentUserToChatWith = chatWith
+
+   selecth4.innerText="enjoy your chat with "+"@"+userToChatWith;
+   const currentChat = document.getElementById('currentChat');
+   currentChat.style.display="inline" ;
+   
+   const reqInfo = {
+    sender : userRoom,
+    reciver : presentUserToChatWith
+   }
+  
+
+   socket.emit("sendAllMsg",reqInfo)
+
+   socket.once(("getAllChats"+presentUserToChatWith),(data)=>{
+    
+  //  const temp={
+  //    user:document.getElementById('random').innerText,
+  //    sender:data[0].sender,
+  //    reciever: data[0].reciver
+  //  }
+
+  
+   
+
+    const allMsgs=data;
+   if(allMsgs){
+     allMsgs.forEach((ele)=>{
+        const temp= document.createElement('ul');
+        temp.appendChild(document.createTextNode(ele.content))
+        temp.classList.add('ulForMsg')
+        //insertSpan(temp)
+
+        const SpanElement= document.createElement('sub')
+        SpanElement.classList.add('subClass')
+        
+        temp.appendChild(SpanElement)
+        
+         
+        const userId = (userRoom.split("-"))[0];
+        const senderId = ele.sender._id;
+         const reciverId = ele.reciver._id;
+
+        //  console.log("senderId : ",ele.sender)
+       
+        //  const triplet ={
+        //    userId,
+        //    senderId,
+        //    reciverId
+        // }
+       //console.log("triplet : ",triplet)
+        
+        if(userId==senderId){
+          temp.classList.add('classForSender')
+          console.log("case 1 executed")
+        }
+         else {
+            temp.classList.add('classForReciver')
+             console.log("case 2 executed")         
+         }
+
+        document.getElementById('allMsg').appendChild(temp)
+     })
+   }
+
+   })
+   
+
+  //  socket.on("getAllChats",(data)=>{
+  //    allMsg=data;
+  //  })
+
+  //  console.log("all msg : ",allMsg)
+  //  if(allMsg){
+  //    allMsg.forEach((ele)=>{
+  //       const temp= document.createElement('li');
+  //       temp.appendChild(document.createTextNode(ele.content))
+
+  //       document.getElementById('allMsg').appendChild(temp)
+  //    })
+  //  }
+}
+
+const sendMsgBtn = document.getElementById('sendMsg');
+sendMsgBtn.addEventListener('click',forMsg)
+
+function forMsg(e){
+
+  const presentMsg = document.getElementById('presentMsg');
+  const msgInfo = {
+     sender: userRoom,
+     reciver: presentUserToChatWith,
+     msg:presentMsg.value
+  }
+
+  if(presentUserToChatWith.length && presentMsg.value){
+    socket.emit('msg',msgInfo)
+  }
+  presentMsg.value=''
+}
+
+ socket.on('msgToMe',(data)=>{
+  //console.log("something comming ....")
+    if(document.getElementById('allMsg').style.display!='none' && 
+    (presentUserToChatWith==data.reciver || presentUserToChatWith==data.sender)){
+     
+        const temp= document.createElement('ul');
+        
+        temp.classList.add('ulForMsg')
+        temp.appendChild(document.createTextNode(data.msg))
+        
+        const userId = userRoom.split('-')[0];
+        const senderId = (data.sender.split('-'))[0];
+        const triplet ={
+           userId,
+           senderId,
+           reciverId:(data.reciver.split('-'))[0]
+        }
+        //console.log("triplet : ",triplet)
+
+        if(userId==senderId){
+           temp.classList.add('classForSender')
+          //  console.log('case 1 executed')
+        }
+        else {
+           temp.classList.add('classForReciver')
+          //  console.log('case 2 executed')
+        }
+
+        //insertSpan(temp)
+        document.getElementById('allMsg').appendChild(temp)
+    }
+ })
+  
+ function insertSpan(temp){
+    const SpanElement= document.createElement('span')
+    SpanElement.classList.add("badge badge-primary badge-pill")
+    SpanElement.innerText="14"
+    temp.appendChild(SpanElement)
+ }
+
+</script>

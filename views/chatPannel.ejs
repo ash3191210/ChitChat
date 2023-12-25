@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <%-include('./header.ejs');%>
+</head>
+<body>
+    <h1 style="text-align: center;">
+        Websockets experiments
+    </h1>
+    <h3 style="text-align: center;" id="random"><%= username%></h3>
+     <input type="text" name="roomid" value="<%=uid%>-roomid" hidden id="myroomid">
+
+     
+     
+        <ul class="list-group ulclass">
+            <% users.forEach((user)=>{%>
+                <li id="<%=user._id%>-uid" class="list-group-item listclass"> <%=user.username%>
+                    <span class="badge badge-primary badge-pill spanclass" id="<%=user._id%>-roomid">start chat</span>
+                </li>
+             <% }) %>
+        </ul>
+
+        <div id="currentChat">
+             <h4 id="chatWith"></h4>
+            <div id="allMsg"></div>
+            <input type="text" name="" id="presentMsg"><button id="sendMsg">Send</button>
+        </div>
+    
+     
+    <%- include('./footer.ejs') ;%>
+    
+</body>
+</html>
